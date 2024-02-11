@@ -19,4 +19,36 @@ CHIP PC {
     
     PARTS:
     //// Replace this comment with your code.
+    //Mux16(a=mux2out, b=in, sel=load, out=mux1out);
+    //Register(in=mux1out, load=true, out=registerout);
+    //Inc16(in=registerout, out=incout);
+    //Not(in=load, out=notload);
+    //And(a=inc, b=notload, out=incandnotload);
+    //Mux16(a=registerout, b=incout, sel=incandnotload, out=mux2out);
+    //Mux16(a=mux2out, b=false, sel=reset, out=out);
+
+    //Mux16(a=registerout, b=in, sel=load, out=mux1out);
+    //Inc16(in=mux1out, out=incout);
+    //Not(in=load, out=notload);
+    //And(a=inc, b=notload, out=incandnotload);
+    //Mux16(a=mux1out, b=incout, sel=incandnotload, out=mux2out);
+    //Register(in=mux2out, load=true, out=registerout);
+    //Mux16(a=registerout, b=false, sel=reset, out=out);
+
+    
+    Mux16(a=registerout, b=in, sel=load, out=mux1out);
+    Inc16(in=mux1out, out=incout);
+    Not(in=load, out=notload);
+    And(a=inc, b=notload, out=incandnotload);
+    Mux16(a=mux1out, b=incout, sel=incandnotload, out=mux2out);
+    Mux16(a=mux2out, b=false, sel=reset, out=mux3out);
+    Register(in=mux3out, load=true, out=registerout, out=out);
+    
+
+
+
+
+
+
+
 }
