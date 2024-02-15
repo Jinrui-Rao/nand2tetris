@@ -33,4 +33,37 @@ CHIP CPU {
 
     PARTS:
     //// Replace this comment with your code.
+    Mux16(a=instruction, b=ALUoutput, sel=instruction[15], out=Mux1out);
+    Not(in=instruction[15], out=noti);
+    Or(a=instruction[5], b=noti, out=d1OrNoti);
+    ARegister(in=Mux1out, load=d1OrNoti, out=Aregister, out[0..14]=addressM);
+    Mux16(a=Aregister, b=inM, sel=instruction[12], out=Mux2out);
+
+    And(a=instruction[4], b=instruction[15], out=dload);
+    DRegister(in=ALUoutput, load=dload, out=Dregister);
+    ALU(x=Dregister, y=Mux2out, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=ALUoutput, zr=zrout, ng=ngout, out=outM);
+    And(a=instruction[3], b=instruction[15], out=writeM);
+
+    Not(in=ngout, out=notng);
+    Not(in=zrout, out=notzr);
+    And(a=notng, b=notzr, out=notngAndnotzr);
+    Or(a=ngout, b=zrout, out=ngorzr);
+
+    //Mux8Way16(a[0]=false, a[1..15]=true, b[0]=notngAndnotzr,b[1..15]=true, c[0]=zrout,c[1..15]=true, d[0]=notng,d[1..15]=true, e[0]=ngout,e[1..15]=true, f[0]=notzr,f[1..15]=true, g[0]=ngorzr,g[1..15]=true, h[0]=1,h[1..15]=true, sel=instruction[0..2], out[0]=Mux3out,out[1..15]=ignore);
+    //Mux8Way16(a=true, b[0]=notngAndnotzr, c[0]=zrout, d[0]=notng, e[0]=ngout,f[0]=notzr,g[0]=ngorzr,h[0]=1,h[1..15]=true, sel=instruction[0..2], out[0]=Mux3out,out[1..15]=ignore);
+    Mux(a=false, b=notngAndnotzr, sel=instruction[0], out=mux10);
+    Mux(a=zrout, b=notng, sel=instruction[0], out=mux11);
+    Mux(a=ngout, b=notzr, sel=instruction[0], out=mux12);
+    Mux(a=ngorzr, b=true, sel=instruction[0], out=mux13);
+    Mux(a=mux10, b=mux11, sel=instruction[1], out=mux20);
+    Mux(a=mux12, b=mux13, sel=instruction[1], out=mux21);
+    Mux(a=mux20, b=mux21, sel=instruction[2], out=Mux3out);
+
+
+
+
+    And(a=instruction[15], b=Mux3out, out=pcload);
+    PC(in=Aregister, inc=true, load=pcload, reset=reset, out[0..14]=pc);
+
+
 }
